@@ -1,0 +1,24 @@
+{
+  "name": "soen/http-server",
+  "description": "soen/http-server",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "soen",
+      "email": "soen66@163.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "psr/http-server-middleware": "^1.0",
+    "psr/http-server-handler": "^1.0",
+    "soen/http-message": "dev-master"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Soen\\Http\\Server\\": "src/"
+    }
+  }
+}
