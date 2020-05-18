@@ -38,6 +38,9 @@ class MiddlewareDispatcher
 		$this->request  = $request;
 		$this->response = $response;
 		foreach ($middleware as $class) {
+		    if (is_callable($class)) {
+		        $class($request, $response);
+            }
 			$object = new $class(
 				$request,
 				$response
