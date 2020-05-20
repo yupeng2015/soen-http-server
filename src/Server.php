@@ -129,9 +129,21 @@ class Server implements ServerInterface
         $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
         $server->set($this->options);
         $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp)use($handler){
-            $request =  (new ServerRequestFactory)->createServerRequestFromSwoole();
-            $response = (new ServerResponseFactory)->createResponseFromSwoole();
-            $handler->handle($request, $response);
+            try {
+                $request = (new ServerRequestFactory)->createServerRequestFromSwoole();
+                $response = (new ServerResponseFactory)->createResponseFromSwoole();
+                $handler->handle($request, $response);
+            }catch (\Throwable $error){
+                // 错误处理
+                throw $error;
+//                $isMix = class_exists(\Mix::class);
+//                if (!$isMix) {
+//                    throw $error;
+//                }
+                /** @var \Mix\Console\Error $error */
+                $error = \Mix::$app->context->get('error');
+                $error->handleException($e);
+            }
         });
         foreach ($this->callbacks as $pattern => $callback) {
             $server->handle($pattern, function (Request $requ, Response $resp) use ($callback) {
