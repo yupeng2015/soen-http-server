@@ -115,11 +115,10 @@ class Server implements ServerInterface
         return $services;
     }
 
-    /**
-     * Start
-     * @param \Mix\Http\Server\HandlerInterface|null $handler
-     * @throws \Swoole\Exception
-     */
+	/**
+	 * @param HandlerInterface|null $handler
+	 * @throws \Swoole\Exception
+	 */
     public function up(HandlerInterface $handler = null)
     {
 //        if (!is_null($handler)) {
@@ -140,7 +139,7 @@ class Server implements ServerInterface
 //                if (!$isMix) {
 //                    throw $error;
 //                }
-                /** @var \Mix\Console\Error $error */
+                /** @var \Soen\Command\Exception\Error $error */
                 $error = \Mix::$app->context->get('error');
                 $error->handleException($e);
             }
@@ -159,7 +158,7 @@ class Server implements ServerInterface
                     if (!$isMix) {
                         throw $e;
                     }
-                    /** @var \Mix\Console\Error $error */
+	                /** @var \Soen\Command\Exception\Error $error */
                     $error = \Mix::$app->context->get('error');
                     $error->handleException($e);
                 }

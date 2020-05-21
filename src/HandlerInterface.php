@@ -8,7 +8,7 @@ use Soen\Http\Message\ServerRequest;
 
 /**
  * Interface HandlerInterface
- * @package Mix\Http\Server
+ * @package Soen\Http\Server
  */
 interface HandlerInterface extends RequestHandlerInterface
 {
