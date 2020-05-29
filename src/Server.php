@@ -116,57 +116,34 @@ class Server implements ServerInterface
     }
 
 	/**
-	 * @param HandlerInterface|null $handler
 	 * @throws \Swoole\Exception
 	 */
-    public function up(HandlerInterface $handler = null)
+    public function up()
     {
+	    $scheduler = new \Swoole\Coroutine\Scheduler;
 //        if (!is_null($handler)) {
 //            $this->callbacks = [];
 //            $this->handle('/', [$handler, 'handleHTTP']);
 //        }
-        $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
-        $server->set($this->options);
-        $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp)use($handler){
-            try {
-                $request = (new ServerRequestFactory)->createServerRequestFromSwoole();
-                $response = (new ServerResponseFactory)->createResponseFromSwoole();
-                $handler->handle($request, $response);
-            }catch (\Throwable $error){
-                // 错误处理
-                throw $error;
-//                $isMix = class_exists(\Mix::class);
-//                if (!$isMix) {
-//                    throw $error;
-//                }
-                /** @var \Soen\Command\Exception\Error $error */
-                $error = \Mix::$app->context->get('error');
-                $error->handleException($e);
-            }
-        });
-        foreach ($this->callbacks as $pattern => $callback) {
-            $server->handle($pattern, function (Request $requ, Response $resp) use ($callback) {
-                try {
-                    // 生成PSR的request,response
-                    $request  = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
-                    $response = (new ResponseFactory)->createResponseFromSwoole($resp);
-                    // 执行回调
-                    call_user_func($callback, $request, $response);
-                } catch (\Throwable $e) {
-                    // 错误处理
-                    $isMix = class_exists(\Mix::class);
-                    if (!$isMix) {
-                        throw $e;
-                    }
-	                /** @var \Soen\Command\Exception\Error $error */
-                    $error = \Mix::$app->context->get('error');
-                    $error->handleException($e);
-                }
-            });
-        }
-        if (!$server->start()) {
-            throw new \Swoole\Exception($server->errMsg, $server->errCode);
-        }
+	    $scheduler->set($this->options);
+	    $scheduler->add(function () {
+		    $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
+		    $server->set($this->options);
+		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp){
+			    try {
+				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole();
+				    $response = (new ServerResponseFactory)->createResponseFromSwoole();
+				    $handler = (new Handler($response))->handle($request);
+			    }catch (\Throwable $error){
+				    // 错误处理
+				    throw $error;
+			    }
+		    });
+		    if (!$server->start()) {
+			    throw new \Swoole\Exception($server->errMsg, $server->errCode);
+		    }
+	    });
+	    $scheduler->start();
     }
 
     /**
