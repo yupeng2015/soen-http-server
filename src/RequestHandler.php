@@ -28,14 +28,15 @@ class RequestHandler implements RequestHandlerInterface
 	public function __construct(ResponseInterface $response)
 	{
 		$this->response = $response;
-		$this->router = \App::getComponent('router');
+		$this->routerProvider = \App::getComponent('router');
 	}
 
 	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
 		$this->routeActive = $this->routerProvider->setRouteActive($request);
-		var_dump($this->routeActive->getRoute());
-		exit;
+		return $this->response;
+//		var_dump($this->routeActive->getRoute());
+//		exit;
 	}
 
 

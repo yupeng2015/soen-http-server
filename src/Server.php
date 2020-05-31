@@ -131,9 +131,9 @@ class Server implements ServerInterface
 		    $server->set($this->options);
 		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp){
 			    try {
-//				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
-//				    $response = (new ServerResponseFactory)->createResponseFromSwoole($resp);
-				    $handler = (new RequestHandler($resp))->handle($requ);
+				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
+				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
+				    $handler = (new RequestHandler($response))->handle($request);
 			    }catch (\Throwable $error){
 				    // 错误处理
 				    throw $error;
