@@ -134,6 +134,7 @@ class Server implements ServerInterface
 				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
 				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
 				    $handler = (new RequestHandler($response))->handle($request);
+                    $handler->end();
 			    }catch (\Throwable $error){
 				    // 错误处理
 				    throw $error;
