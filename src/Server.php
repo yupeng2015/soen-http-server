@@ -129,11 +129,12 @@ class Server implements ServerInterface
 	    $scheduler->add(function () {
 		    $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
 		    $server->set($this->options);
+            $routerProvider = context()->getComponent('router');
 		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp){
 			    try {
 				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
 				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
-				    $handler = (new RequestHandler($response))->handle($request);
+				    $handler = (new RequestHandler($response, $routerProvider))->handle($request);
                     $handler->end();
 			    }catch (\Throwable $error){
 				    // 错误处理
