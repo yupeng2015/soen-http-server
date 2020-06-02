@@ -130,7 +130,7 @@ class Server implements ServerInterface
 		    $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
 		    $server->set($this->options);
             $routerProvider = context()->getComponent('router');
-		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp){
+		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp)use($routerProvider){
 			    try {
 				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
 				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
