@@ -52,10 +52,10 @@ class RequestHandler implements RequestHandlerInterface
         if ($request->getSwooleRequest()->server['path_info'] == '/favicon.ico' || $request->getSwooleRequest()->server['request_uri'] == '/favicon.ico') {
             return $this->response;
         }
-		$this->routeActive = $this->routerProvider->setRouteActive($request);
+		$this->routeCurrent = $this->routerProvider->setRouteActive($request);
         /* 中间件执行 */
-		(new MiddlewareDispatcher($this->routeActive->getMiddleware(), $request, $this->response))->dispatch();
-		$executeData = call_user_func($this->routeActive->getClassAction(true), '');
+		(new MiddlewareDispatcher($this->routeCurrent->getMiddlewares(), $request, $this->response))->dispatch();
+		$executeData = call_user_func_array($this->routeCurrent->getClassAction(true), $this->routeCurrent->getParams());
         $streamBody = (new StreamFactory())->createStream($executeData);
         $this->response->withBody($streamBody);
         $this->response->withContentType('text/html', 'utf-8');
