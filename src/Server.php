@@ -134,8 +134,8 @@ class Server implements ServerInterface
 			    try {
 				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
 				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
-				    $handler = (new RequestHandler($response, $routerProvider))->handle($request);
-                    $handler->end();
+				    $responseHandler = (new RequestHandler($response, $routerProvider))->handle($request);
+                    $responseHandler->end();
 			    }catch (\Throwable $error){
 				    // 错误处理
 				    throw $error;
