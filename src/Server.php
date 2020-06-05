@@ -7,6 +7,8 @@ namespace Soen\Http\Server;
 use Soen\Http\Message\Factory\ResponseFactory;
 use Soen\Http\Message\Factory\ServerRequestFactory;
 use Soen\Http\Message\Factory\ServerResponseFactory;
+use Soen\Http\Message\HttpRequest;
+use Soen\Router\RouterProvider;
 use Soen\Server\ServerInterface;
 
 class Server implements ServerInterface
@@ -129,10 +131,14 @@ class Server implements ServerInterface
 	    $scheduler->add(function () {
 		    $server = $this->swooleServer = new \Swoole\Coroutine\Http\Server($this->host, $this->port, $this->ssl, $this->reusePort);
 		    $server->set($this->options);
+            /**
+             * @var RouterProvider $routerProvider
+             */
             $routerProvider = context()->getComponent('router');
 		    $server->handle('/', function(\Swoole\Http\Request $requ, \Swoole\Http\Response $resp)use($routerProvider){
 			    try {
 				    $request = (new ServerRequestFactory)->createServerRequestFromSwoole($requ);
+                    context()->setComponentServer('request', [$request]);
 				    $response = (new ResponseFactory())->createResponseFromSwoole($resp);
 				    $responseHandler = (new RequestHandler($response, $routerProvider))->handle($request);
                     $responseHandler->end();

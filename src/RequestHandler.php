@@ -57,20 +57,24 @@ class RequestHandler implements RequestHandlerInterface
         }
         try {
             $this->routeCurrent = $this->routerProvider->setRouteCurrent($request);
+            if ($getParams = $this->routeCurrent->getParams()) {
+                $request->withQueryParams($getParams);
+            }
         } catch (NotFoundException $error) {
             // 404 处理
             AbnormalResuest::route404($this->response);
             return $this->response;
         }
+
         /* 中间件执行 */
 		(new MiddlewareDispatcher($this->routeCurrent->getMiddlewares(), $request, $this->response))->dispatch();
         list($className, $action) = $this->routeCurrent->getClassAction();
-//
+//        var_dump($className, $action);
 //        $res = DiProvider::make($className, $action);
 //        var_dump($res);
 //        exit;
-//        $reflectionMethod = new \ReflectionMethod($className, $action);
-//        $args = [];
+        $reflectionMethod = new \ReflectionMethod($className, $action);
+        $args = [];
 //        foreach($reflectionMethod->getParameters() as $parameter) {
 //            if ($class = $parameter->getClass()) {
 ////                $args[] = new $class->name; //$request = new Request
@@ -84,10 +88,10 @@ class RequestHandler implements RequestHandlerInterface
 //                $args[] = $class->newInstanceArgs(); //$request = new Request
 //            }
 //        }
-//        $executeData = $reflectionMethod->invokeArgs(new $className, $args);
+        $executeData = $reflectionMethod->invokeArgs(new $className, [context()->getComponentServer('request')]);
 
 
-		$executeData = call_user_func_array($this->routeCurrent->getClassAction(true), $this->routeCurrent->getParams());
+//		$executeData = call_user_func_array($this->routeCurrent->getClassAction(true), $this->routeCurrent->getParams());
         $streamBody = (new StreamFactory())->createStream($executeData);
         $this->response->withBody($streamBody);
         $this->response->withContentType('text/html', 'utf-8');
